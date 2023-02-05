@@ -18,13 +18,13 @@ export class Car {
   ) { }
   update(dt: number, action: number) {
     this.steering = [-this.steerAngle, 0, +this.steerAngle][action];
-    this.center.x += this.direction.x * this.speed * dt;
-    this.center.y += this.direction.y * this.speed * dt;
     this.direction.x = this.direction.x * Math.cos(this.steering) - this.direction.y * Math.sin(this.steering);
     this.direction.y = this.direction.x * Math.sin(this.steering) + this.direction.y * Math.cos(this.steering);
     const d = Math.sqrt(this.direction.x ** 2 + this.direction.y ** 2);
     this.direction.x /= d;
     this.direction.y /= d;
+    this.center.x += this.direction.x * this.speed * dt;
+    this.center.y += this.direction.y * this.speed * dt;
   }
   sensorsLines = (): Line[] => this.sensors.map(sensor => ({
     p1: this.center,
