@@ -5,16 +5,16 @@ import { zip } from "./commons";
 
 type Transition = { state: number[], action: number, reward: number, nextState: number[], done: boolean }
 
-const LR = 0.01
+const LR = 0.05
 const GAMMA = 0.98
 const BUFFER_LIMIT = 10000
-const BATCH_SIZE = 64
+const BATCH_SIZE = 128
 const EPOCHS = 20
 const EPS_END = 0.001
-const EPS_START = 0.2
-const EPS_DECAY = 200
+const EPS_START = 0.7
+const EPS_DECAY = 60
 const N_ACTIONS = 3;
-const MIN_TRAIN_MEM = 1000;
+const MIN_TRAIN_MEM = 100;
 const SPEED = 180;
 const STEER_ANGLE = Math.PI / 50;
 const SENSOR_LENGTH = 70;
@@ -36,16 +36,16 @@ const train = (q: MLP, qTarget: MLP, buffer: Transition[], opt: Optimizer) => {
     opt.step();
   }
 }
-
+const getEps = (step: number) => EPS_END + (EPS_START - EPS_END) * Math.exp(-1. * (1.1 ** step) / EPS_DECAY);
 const selectAction = (net: MLP, state: number[], step: number) => {
-  const eps_threshold = EPS_END + (EPS_START - EPS_END) * Math.exp(-1. * step / EPS_DECAY);
+  const eps_threshold = getEps(step);
   return Math.random() > eps_threshold ? net.forward(state).reduce((i, _, j, a) => a[i].getValue() > a[j].getValue() ? i : j, 0) : Math.floor(Math.random() * N_ACTIONS);
 }
 
 const main = async () => {
   const canvas = document.getElementById('main-canvas') as HTMLCanvasElement;
   const env = new CarEnv(world, SENSOR_LENGTH, SPEED, STEER_ANGLE);
-  const shape = [env.state().length, 5, 5, N_ACTIONS];
+  const shape = [env.state().length, 5, N_ACTIONS];
   const q = new MLP(shape);
   const qTarget = new MLP(shape);
   const memory: Transition[] = [];
@@ -62,7 +62,7 @@ const main = async () => {
       game = nextGame;
 
       score += nextGame.reward;
-      document.getElementById('status')!.innerText = `Episode: ${nEpisodes.toString()}, Score: ${score.toFixed(2)}`;
+      document.getElementById('status')!.innerText = `Episode: ${nEpisodes.toString()}, Score: ${score.toFixed(2)}, EPS: ${getEps(nEpisodes).toFixed(2)}, MemSZ: ${memory.length}`;
       env.render(canvas);
       await new Promise(requestAnimationFrame);
     }
