@@ -3,7 +3,7 @@
 Reinforcement Leanring (DQN) from scratch with zero dependencies applied to a simple car driving game. 
 [Check it out here](https://desi-ivanov.github.io/cars-rl/)!
 
-https://user-images.githubusercontent.com/20824840/216838023-d300f62e-01bc-48c1-8e72-2731504adbb2.mp4
+https://github.com/desi-ivanov/cars-rl/assets/20824840/a7390984-4c6d-476c-8092-6f8d5fa3c033
 
 # Details
 
