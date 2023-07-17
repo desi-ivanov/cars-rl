@@ -5,12 +5,16 @@
     <link rel="icon" type="image/svg+xml" href="./vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cars RL</title>
-    <script type="module" crossorigin src="./assets/index-06f214c7.js"></script>
+    <script type="module" crossorigin src="./assets/index-63939fab.js"></script>
   </head>
   <body>
-    <div>
-      <div id="status">Episode: 0, Score: 0</div>
-      <canvas id="main-canvas" width="800" height="800" style="border: 1px solid black;"></canvas>
+    <div id="status">Episode: 0, Score: 0</div>
+    <div style="display: flex; flex-direction: row;">
+      <canvas id="main-canvas" width="800" height="800" style="width: 800px; height: 800px;"></canvas>
+      <div style="display: flex; flex-direction: column;">
+        <canvas id="net-canvas" width="400" height="400" style="width: 400px;height: 400px;"></canvas>
+        <canvas id="loss-canvas" width="400" height="400" style="width: 400px;height: 400px; border-width: 0px 0px 1px 1px; border-style: solid; border-color:  black;"></canvas>
+      </div>
     </div>
     
   </body>
