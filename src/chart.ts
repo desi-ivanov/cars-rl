@@ -4,7 +4,7 @@ import { distance } from "./gym";
 export const drawChart = (canvas: HTMLCanvasElement, values: number[]) => {
   const ctx = canvas.getContext("2d")!;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const minDx = 5;
+  const minDx = 2;
   values = values.slice(-(canvas.width / minDx));
   const dx = Math.max(minDx, canvas.width / (values.length - 1));
   let x = 0;
