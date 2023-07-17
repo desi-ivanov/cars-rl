@@ -57,7 +57,7 @@ export const drawGraph = (canvas: HTMLCanvasElement, net: MLP, inputs: number[])
   const maxW = edges.reduce((a, b) => a.w > b.w ? a : b).w;
   const norm = (x: number) => (x - minW) / (maxW - minW);
   ctx.save();
-  ctx.translate(rad, rad);
+  ctx.translate(rad + 1, rad + 1);
   for(const edge of edges) {
     ctx.save();;
     ctx.beginPath();
