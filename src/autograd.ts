@@ -118,7 +118,7 @@ export class Linear  {
 
 export class MLP  {
   layers: Linear[];
-  constructor(shape: number[], private readonly act: (x: Parameter) => Parameter = x => x.sigmoid()) {
+  constructor(shape: number[], public readonly act: (x: Parameter) => Parameter = x => x.sigmoid()) {
     this.layers = shape.slice(1).map((n, i) => new Linear(shape[i], n));
   }
   forward = (xs: number[]) => this.layers.reduce((acc, layer) => layer.forward(acc).map(this.act.bind(this)), xs.map(x => new Parameter(x)));

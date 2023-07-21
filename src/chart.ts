@@ -1,4 +1,4 @@
-import { MLP } from "./autograd";
+import { MLP, Parameter } from "./autograd";
 import { distance } from "./gym";
 
 export const drawChart = (canvas: HTMLCanvasElement, values: number[]) => {
@@ -34,15 +34,20 @@ export const drawGraph = (canvas: HTMLCanvasElement, net: MLP, inputs: number[])
   const scaleY = 80;
   const ctx = canvas.getContext("2d")!;
   ctx.clearRect(0, 0, canvas.width, canvas.height)
-  type Node = { x: number, y: number };
+  type Node = { x: number, y: number, v: number };
   const nodes: Record<string, Node> = {};
   const edges: { a: Node, b: Node, w: number }[] = [];
+  let xs = inputs.map(x => new Parameter(x));
   for(let i = 0; i < inputs.length; i++) {
-    nodes[`${0},${i}`] = { x: 0, y: i };
+    nodes[`${0},${i}`] = { x: 0, y: i, v: inputs[i] };
   }
   for(let i = 0; i < net.layers.length; i++) {
+    xs = net.layers[i].forward(xs).map(x => net.act(x));
+    const minX = Math.min(...xs.map(x => x.getValue()));
+    const maxX = Math.max(...xs.map(x => x.getValue()));
+    const normX = (x: number) => (x - minX) / (maxX - minX);
     for(let j = 0; j < net.layers[i].w.length; j++) {
-      const node: Node = { x: i + 1, y: j };
+      const node: Node = { x: i + 1, y: j, v: normX(xs[j].getValue()) };
       nodes[`${node.x},${node.y}`] = node;
       for(let k = 0; k < net.layers[i].w[j].w.length; k++) {
         edges.push({
@@ -55,19 +60,19 @@ export const drawGraph = (canvas: HTMLCanvasElement, net: MLP, inputs: number[])
   }
   const minW = edges.reduce((a, b) => a.w < b.w ? a : b).w;
   const maxW = edges.reduce((a, b) => a.w > b.w ? a : b).w;
-  const norm = (x: number) => (x - minW) / (maxW - minW);
+  const normW = (w: number) => (w - minW) / (maxW - minW);
   ctx.save();
   ctx.translate(rad + 1, rad + 1);
   for(const edge of edges) {
-    ctx.save();;
+    ctx.save();
     ctx.beginPath();
-    ctx.fillStyle = `rgba(0, 0, 0, ${norm(edge.w)})`
+    ctx.fillStyle = `rgba(0, 0, 0, ${normW(edge.w)})`
     const scaledA = { x: edge.a.x * scaleX, y: edge.a.y * scaleY };
     const scaledB = { x: edge.b.x * scaleX, y: edge.b.y * scaleY };
     const dif = { x: scaledB.x - scaledA.x, y: scaledB.y - scaledA.y, };
     ctx.translate(scaledA.x, scaledA.y);
     ctx.rotate(-Math.atan2(dif.x, dif.y));
-    ctx.rect(0, 0, norm(edge.w) * 10, distance(scaledA, scaledB));
+    ctx.rect(0, 0, normW(edge.w) * 10, distance(scaledA, scaledB));
     ctx.fill();
     ctx.closePath();
     ctx.restore();
@@ -75,7 +80,9 @@ export const drawGraph = (canvas: HTMLCanvasElement, net: MLP, inputs: number[])
   for(const node of Object.values(nodes)) {
     ctx.beginPath();
     ctx.arc(node.x * scaleX, node.y * scaleY, rad, 0, Math.PI * 2);
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = `#FFF`;
+    ctx.fill();
+    ctx.fillStyle = `rgba(255, 0, 0, ${node.v})`;
     ctx.strokeStyle = "#000";
     ctx.fill();
     ctx.stroke();

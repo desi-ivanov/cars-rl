@@ -70,13 +70,13 @@ const main = async () => {
       score += nextGame.reward;
       document.getElementById('status')!.innerText = `Episode: ${nEpisodes.toString()}, Score: ${score.toFixed(2)}, EPS: ${getEps(nEpisodes).toFixed(2)}, MemSZ: ${memory.length}`;
       env.render(gameCanvas);
+      drawGraph(netCanvas, q, game.state);
       await new Promise(requestAnimationFrame);
     }
     if(memory.length > MIN_TRAIN_MEM) {
       const loss = train(q, qTarget, memory, optim);
       losses.push(loss);
     }
-    drawGraph(netCanvas, q, game.state);
     drawChart(lossCanvas, losses);
     if(nEpisodes % 10 === 0) {
       const bp = q.parameters();
